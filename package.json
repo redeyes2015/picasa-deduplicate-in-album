@@ -1,0 +1,19 @@
+{
+  "name": "gphoto-express-test",
+  "version": "0.1.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.13.4",
+    "googleapis": "^2.1.7",
+    "jade": "^1.11.0",
+    "xmldom": "^0.1.22"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ./app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "redeyes2015@gmail.com",
+  "license": "ISC"
+}
