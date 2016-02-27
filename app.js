@@ -28,12 +28,15 @@ app.get('/', function (req, res) {
 app.all('/getToken', function (req, res) {
   console.log(`baseUrl: ${req.baseUrl}`);
   console.log(`query: ${JSON.stringify(req.query, null, 4)}`);
-  res.send('');
 
   oauth2Client.getToken(req.query.code, function(err, tokens) {
     if(!err) {
       console.log(`got token!? ${JSON.stringify(tokens)}`);
       bar(tokens);
+      res.send('success');
+    }
+    else {
+      res.send('failed...');
     }
   });
 });
