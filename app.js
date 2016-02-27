@@ -18,10 +18,11 @@ const app = express();
 app.set('view engine', 'jade');
 
 app.get('/', function (req, res) {
-  res.render('index', {url: oauth2Client.generateAuthUrl({
+  const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: prjCreds.scope
-  })});
+  });
+  res.render('index', {url});
 });
 
 app.all('/getToken', function (req, res) {
