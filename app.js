@@ -32,7 +32,7 @@ app.all('/getToken', function (req, res) {
   oauth2Client.getToken(req.query.code, function(err, tokens) {
     if(!err) {
       console.log(`got token!? ${JSON.stringify(tokens)}`);
-      bar(tokens);
+      getAlbumFeed(tokens);
       res.send('success');
     }
     else {
@@ -41,7 +41,7 @@ app.all('/getToken', function (req, res) {
   });
 });
 
-function bar (tokens) {
+function getAlbumFeed (tokens) {
  // https://picasaweb.google.com/data/feed/api/user/default/albumid/5880167132169410689?max-results=1&prettyprint=true 
   let req = https.request({
       method: 'GET',
