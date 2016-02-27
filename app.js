@@ -28,16 +28,12 @@ app.get('/', function (req, res) {
 app.all('/getToken', function (req, res) {
   console.log(`baseUrl: ${req.baseUrl}`);
   console.log(`query: ${JSON.stringify(req.query, null, 4)}`);
-  //console.log(JSON.stringify(req, null, 4));
   res.send('');
 
   oauth2Client.getToken(req.query.code, function(err, tokens) {
-    // Now tokens contains an access_token and an optional refresh_token. Save them. 
     if(!err) {
       console.log(`got token!? ${JSON.stringify(tokens)}`);
       bar(tokens);
-      //oauth2Client.setCredentials(tokens);
-      //foo(oauth2Client, new Set(), void 0, 0);
     }
   });
 });
