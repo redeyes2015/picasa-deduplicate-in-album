@@ -15,6 +15,8 @@ const oauth2Client = new OAuth2(prjCreds.client_id, prjCreds.client_secret, prjC
 
 const app = express();
 
+let authTokens = null;
+
 app.set('view engine', 'jade');
 
 app.get('/', function (req, res) {
@@ -32,7 +34,8 @@ app.all('/getToken', function (req, res) {
   oauth2Client.getToken(req.query.code, function(err, tokens) {
     if(!err) {
       console.log(`got token!? ${JSON.stringify(tokens)}`);
-      getAlbumFeed(tokens);
+      authTokens = tokens;
+      getAlbumFeed();
       res.render('success');
     }
     else {
@@ -41,7 +44,7 @@ app.all('/getToken', function (req, res) {
   });
 });
 
-function getAlbumFeed (tokens) {
+function getAlbumFeed () {
  // https://picasaweb.google.com/data/feed/api/user/default/albumid/5880167132169410689?max-results=1&prettyprint=true 
   let req = https.request({
       method: 'GET',
@@ -49,7 +52,7 @@ function getAlbumFeed (tokens) {
       path: '/data/feed/api/user/default/albumid/5880167132169410689?max-results=1&prettyprint=true',
       headers: {
         'Gdata-version': '2',
-        Authorization: `${tokens.token_type} ${tokens.access_token}`
+        Authorization: `${authTokens.token_type} ${authTokens.access_token}`
       }
   }, res => {
       console.log(`STATUS: ${res.statusCode}`);
