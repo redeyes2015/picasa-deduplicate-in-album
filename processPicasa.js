@@ -1,6 +1,6 @@
 'use strict';
 
-const https = require('https');
+const httpsPromise = require('./httpsPromise.js');
 const url = require('url');
 const DOMParser = require('xmldom').DOMParser;
 
@@ -12,30 +12,17 @@ function setAuthTokens (tokens) {
 
 function getAlbumFeed (tokens) {
  // https://picasaweb.google.com/data/feed/api/user/default/albumid/5880167132169410689?max-results=1&prettyprint=true 
-  let req = https.request({
-      method: 'GET',
-      hostname: 'picasaweb.google.com',
-      path: '/data/feed/api/user/default/albumid/5880167132169410689',
-      headers: {
-        'Gdata-version': '2',
-        Authorization: `${authTokens.token_type} ${authTokens.access_token}`
-      }
-  }, res => {
-      console.log(`STATUS: ${res.statusCode}`);
-      console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-      res.setEncoding('utf8');
-      const bodies = [];
-      res.on('data', (chunk) => {
-              bodies.push(chunk);
-              });
-      res.on('end', () => {
-              console.log('>>>>> No more data in response.')
-              gatherImageInfos(bodies.join(''));
-              //checkGetImage(authTokens, bodies.join(''))
-      });
-  });
 
-  req.end();
+  httpsPromise(
+      "https://picasaweb.google.com/data/feed/api/user/default/albumid/5880167132169410689",
+      {
+          headers: {
+            'Gdata-version': '2',
+            Authorization: `${authTokens.token_type} ${authTokens.access_token}`
+          }
+      }
+  )
+  .then(gatherImageInfos);
 }
 
 function gatherImageInfos(albumXML) {
@@ -84,30 +71,15 @@ function deleteDupes (dupedIDs) {
   const Queue = require('async').queue;
 
   const queue = Queue((photoID, done) => {
-      const urlParts = url.parse(photoID);
-      console.log(`deleting... : hostname: ${urlParts.hostname}, path: ${urlParts.path}`);
-      const req = https.request({
+      httpsPromise(photoID, {
           method: 'DELETE',
-          hostname: urlParts.hostname,
-          path: urlParts.path,
           headers: {
             'Gdata-version': '2',
             'If-Match': '*',
             Authorization: `${authTokens.token_type} ${authTokens.access_token}`
           }
-      }, res => {
-          console.log(`STATUS: ${res.statusCode}`);
-          console.log(`HEADERS: ${JSON.stringify(res.headers, null, 2)}`);
-          res.setEncoding('utf8');
-          res.on('data', (chunk) => {
-              console.log(chunk);
-          });
-          res.on('end', () => done());
-      });
-
-      req.on('error', err => done(err));
-
-      req.end();
+      })
+      .then(() => done(), (err) => done(err));
   }, 5);
 
   const process = require('process');
@@ -149,7 +121,7 @@ function checkGetImage(tokens, albumXML) {
       Authorization: `${tokens.token_type} ${tokens.access_token}`
   };
 
-  https.get(imgUrlParts, (res) => {
+  require('https').get(imgUrlParts, (res) => {
       console.log('statusCode: ', res.statusCode);
       console.log('headers: ', JSON.stringify(res.headers, null, 2));
   }).on('error', (e) => {
