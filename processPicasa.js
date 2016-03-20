@@ -35,15 +35,11 @@ function gatherImageInfos(albumXML) {
   const lazyGetText = (el, tagName) => {
       return el.getElementsByTagName(tagName)[0].firstChild.textContent;
   };
-  const getSource = (el) => {
-      return doc.getElementsByTagName('content').item(0).getAttribute('src');
-  };
 
   for(let i = 0, l = entryTags.length; i < l; ++i) {
     const entry = entryTags.item(i);
     const id = lazyGetText(entry, 'id');
     const title = lazyGetText(entry, 'title');
-    const src = getSource(entry);
     const editLink = ((links) => {
         for (let i = 0, l = links.length; i < l; ++i) {
             const linkTag = links.item(i);
@@ -55,10 +51,10 @@ function gatherImageInfos(albumXML) {
     })(entry.getElementsByTagName('link'));
 
     if (allTitles.has(title)) {
-      dupes.push([{id, title, src, editLink}, allTitles.get(title)]);
+      dupes.push([{id, title, editLink}, allTitles.get(title)]);
     }
     else {
-      allTitles.set(title, { id, title, src, editLink })
+      allTitles.set(title, { id, title, editLink })
     }
   }
   console.log(`dupes.length: ${dupes.length}`);
