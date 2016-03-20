@@ -13,22 +13,15 @@ function setAuthTokens (tokens) {
 function getAlbumFeed (tokens) {
  // https://picasaweb.google.com/data/feed/api/user/default/albumid/5880167132169410689?max-results=1&prettyprint=true 
 
-  httpsPromise(
-      "https://picasaweb.google.com/data/feed/api/user/default/albumid/5880167132169410689",
-      {
-          headers: {
-            'Gdata-version': '2',
-            Authorization: `${authTokens.token_type} ${authTokens.access_token}`
+  return httpsPromise(
+          "https://picasaweb.google.com/data/feed/api/user/default/albumid/5880167132169410689",
+          {
+              headers: {
+                'Gdata-version': '2',
+                Authorization: `${authTokens.token_type} ${authTokens.access_token}`
+              }
           }
-      }
-  )
-  .then(gatherImageInfos)
-  .then(deleteDupes)
-  .then(() => {
-     console.log('yup, it\'s all done now');
-     const process = require('process');
-     process.nextTick(() => process.exit());
-  });
+  );
 }
 
 function gatherImageInfos(albumXML) {
@@ -70,7 +63,7 @@ function gatherImageInfos(albumXML) {
   }
   console.log(`dupes.length: ${dupes.length}`);
 
-  return dupes.map(d => d[0].editLink).filter(l => l != '').slice(0, 1);
+  return dupes.map(d => d[0].editLink).filter(l => l != '');
 }
 
 function deleteDupes (dupedIDs) {
