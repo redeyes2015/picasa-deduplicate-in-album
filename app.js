@@ -33,7 +33,7 @@ app.all('/getToken', function (req, res) {
     if(!err) {
       console.log(`got token!? ${JSON.stringify(tokens)}`);
       getAlbumFeed(tokens);
-      res.send('success');
+      res.render('success');
     }
     else {
       res.send('failed...');
