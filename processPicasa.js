@@ -22,7 +22,13 @@ function getAlbumFeed (tokens) {
           }
       }
   )
-  .then(gatherImageInfos);
+  .then(gatherImageInfos)
+  .then(deleteDupes)
+  .then(() => {
+     console.log('yup, it\'s all done now');
+     const process = require('process');
+     process.nextTick(() => process.exit());
+  });
 }
 
 function gatherImageInfos(albumXML) {
@@ -64,7 +70,7 @@ function gatherImageInfos(albumXML) {
   }
   console.log(`dupes.length: ${dupes.length}`);
 
-  deleteDupes(dupes.map(d => d[0].editLink).filter(l => l != '').slice(0, 1));
+  return dupes.map(d => d[0].editLink).filter(l => l != '').slice(0, 1);
 }
 
 function deleteDupes (dupedIDs) {
@@ -82,23 +88,10 @@ function deleteDupes (dupedIDs) {
       .then(() => done(), (err) => done(err));
   }, 5);
 
-  const process = require('process');
-
-  process.drain = () => {
-      console.log('all done!');
-      process.exit();
-  };
-
-  let jobCount = dupedIDs.length;
-  const jobDone = () => {
-      --jobCount;
-      if (jobCount <= 0) {
-          console.log('all done!');
-          process.nextTick(() => process.exit());
-      }
-  }
-
-  dupedIDs.forEach((photoID) => queue.push(photoID, jobDone));
+  return new Promise((res, rej) => {
+      queue.drain = res;
+      dupedIDs.forEach((photoID) => queue.push(photoID));
+  });
 }
 
 function checkGetImage(tokens, albumXML) {
