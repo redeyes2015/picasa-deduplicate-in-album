@@ -25,7 +25,6 @@ app.get('/', function (req, res) {
 });
 
 app.all('/getToken', function (req, res) {
-  console.log(`baseUrl: ${req.baseUrl}`);
   console.log(`query: ${JSON.stringify(req.query, null, 4)}`);
 
   oauth2Client.getToken(req.query.code, function(err, tokens) {
