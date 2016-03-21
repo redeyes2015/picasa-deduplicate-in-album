@@ -63,6 +63,10 @@ function gatherImageInfos(albumXML) {
 }
 
 function deleteDupes (dupedIDs) {
+  if (dupedIDs.length < 1) {
+      return;
+  }
+
   const Queue = require('async').queue;
 
   const queue = Queue((photoID, done) => {
