@@ -35,7 +35,6 @@ app.all('/getToken', function (req, res) {
 
       processPicasa.getAlbumFeed()
       .then(processPicasa.gatherImageInfos)
-      .then((dupes) => dupes.slice(0, 1))
       .then(processPicasa.deleteDupes)
       .then(() => {
          console.log('yup, it\'s all done now');
